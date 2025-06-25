@@ -3,530 +3,1951 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>昶青物流-派車GAI數據管理系統</title>
+    <title>派車GAI數據管理系統</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <style>
+        /* ===== CSS 樣式保持不變 ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* 導航列 */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 70px;
+        }
+
+        .nav-brand {
             display: flex;
             align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            gap: 0.5rem;
         }
 
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            transform: translateY(-20px);
-            animation: slideIn 0.8s ease-out forwards;
+        .nav-brand i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
         }
 
-        @keyframes slideIn {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .nav-brand h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .logo-section {
-            margin-bottom: 30px;
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .company-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #4CAF50, #45a049);
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--light-bg);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-color);
             border-radius: 50%;
-            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
             color: white;
-            box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
+            font-size: 0.875rem;
+            font-weight: 600;
         }
 
-        .company-name {
-            font-size: 28px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
+        .user-details {
+            display: flex;
+            flex-direction: column;
         }
 
-        .system-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
         }
 
-        .subtitle {
-            color: #7f8c8d;
-            font-size: 14px;
-            margin-bottom: 30px;
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* 側邊選單 */
+        .sidebar {
+            background: white;
+            width: 250px;
+            height: calc(100vh - 70px);
+            position: fixed;
+            top: 70px;
+            left: 0;
+            border-right: 1px solid var(--border-color);
+            padding: 1rem 0;
+            overflow-y: auto;
+            z-index: 999;
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: var(--light-bg);
+        }
+
+        .menu-item.active {
+            background-color: #eff6ff;
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 主要內容區 */
+        .main-content {
+            margin-left: 250px;
+            margin-top: 70px;
+            padding: 2rem;
+            min-height: calc(100vh - 70px);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+        }
+
+        .btn-large {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* 卡片樣式 */
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* 儀表板網格 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-number.alert {
+            color: var(--danger-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* 快速操作 */
+        .quick-actions {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* 表單樣式 */
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+            margin-bottom: 1rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #34495e;
+            margin-bottom: 0.5rem;
             font-weight: 500;
-            font-size: 14px;
+            color: var(--text-primary);
         }
 
-        .input-container {
-            position: relative;
+        .radio-group {
+            display: flex;
+            gap: 1rem;
         }
 
-        .form-control {
-            width: 100%;
-            padding: 15px 20px 15px 50px;
-            border: 2px solid #e1e8ed;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #95a5a6;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .login-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .error-message {
-            background: #fee;
-            color: #e74c3c;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #e74c3c;
-            display: none;
-            text-align: left;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #28a745;
-            display: none;
-            text-align: left;
-        }
-
-        .loading-spinner {
-            display: none;
-            margin-left: 10px;
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #ffffff;
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .remember-me {
+        .radio-group label {
             display: flex;
             align-items: center;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #7f8c8d;
+            gap: 0.25rem;
+            margin-bottom: 0;
+            font-weight: normal;
         }
 
-        .remember-me input {
-            margin-right: 8px;
+        /* 篩選區域 */
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
         }
 
-        .footer-info {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #ecf0f1;
-            color: #95a5a6;
-            font-size: 12px;
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
 
-        .version-info {
-            margin-top: 10px;
-            font-size: 11px;
-            color: #bdc3c7;
+        .filter-group .form-input,
+        .filter-group .form-select {
+            flex: 1;
+            margin-bottom: 0;
         }
 
-        /* 響應式設計 */
-        @media (max-width: 480px) {
-            .login-container {
-                margin: 20px;
-                padding: 30px 25px;
-            }
-            
-            .company-name {
-                font-size: 24px;
-            }
-            
-            .system-title {
-                font-size: 20px;
-            }
+        /* 表格樣式 */
+        .table-container {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
 
-        /* 背景動畫 */
-        .bg-animation {
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: var(--light-bg);
+        }
+
+        /* 狀態標籤 */
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.啟用 {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.停用 {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* 進度條 */
+        .progress-container {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* 結果顯示 */
+        .result-summary {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-label {
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 600;
+        }
+
+        .result-value.improvement {
+            color: var(--success-color);
+        }
+
+        /* 載入遮罩 */
+        .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
 
-        .bg-circle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            animation: float 6s ease-in-out infinite;
+        .loading-overlay.show {
+            display: flex;
         }
 
-        .bg-circle:nth-child(1) {
-            width: 100px;
-            height: 100px;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
+        .loading-spinner {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
         }
 
-        .bg-circle:nth-child(2) {
-            width: 150px;
-            height: 150px;
-            top: 60%;
-            right: 10%;
-            animation-delay: 2s;
+        .loading-spinner i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
         }
 
-        .bg-circle:nth-child(3) {
-            width: 80px;
-            height: 80px;
-            bottom: 20%;
-            left: 20%;
-            animation-delay: 4s;
+        /* 模態視窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-brand h1 {
+                font-size: 1rem;
+            }
+
+            .user-details {
+                display: none;
+            }
+        }
+
+        /* 優化容器 */
+        .optimization-container {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .optimization-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* 通知樣式 */
+        .notification {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: var(--success-color);
+        }
+
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+
+        .notification.info {
+            background-color: var(--info-color);
+        }
+
+        /* 連線狀態指示器 */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            z-index: 1000;
+        }
+
+        .connection-status.online {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .connection-status.offline {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .connection-status.mock {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        /* 權限不足提示 */
+        .permission-denied {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .permission-denied i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--warning-color);
         }
     </style>
 </head>
 <body>
-    <!-- 背景動畫 -->
-    <div class="bg-animation">
-        <div class="bg-circle"></div>
-        <div class="bg-circle"></div>
-        <div class="bg-circle"></div>
+    <!-- 頂部導航 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-truck"></i>
+            <h1>昶青物流-派車GAI數據管理系統</h1>
+        </div>
+        <div class="nav-user">
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">載入中...</div>
+                    <div class="user-role" id="userRole">...</div>
+                </div>
+            </div>
+            <button id="logoutBtn" class="btn btn-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                登出
+            </button>
+        </div>
+    </nav>
+
+    <!-- 側邊選單 -->
+    <aside class="sidebar" id="sidebar">
+        <ul class="menu-list">
+            <li class="menu-item active" data-page="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>主控台</span>
+            </li>
+            <li class="menu-item" data-page="route-management">
+                <i class="fas fa-route"></i>
+                <span>路線管理</span>
+            </li>
+            <li class="menu-item" data-page="route-optimization">
+                <i class="fas fa-brain"></i>
+                <span>AI路線優化</span>
+            </li>
+            <li class="menu-item" data-page="seasonal-routes">
+                <i class="fas fa-calendar-alt"></i>
+                <span>季節性路線</span>
+            </li>
+            <li class="menu-item" data-page="cargo-vehicle">
+                <i class="fas fa-boxes"></i>
+                <span>載運管理</span>
+            </li>
+            <li class="menu-item" data-page="real-time-monitor">
+                <i class="fas fa-satellite-dish"></i>
+                <span>即時監控</span>
+            </li>
+            <li class="menu-item" data-page="system-settings">
+                <i class="fas fa-cog"></i>
+                <span>系統設定</span>
+            </li>
+            <li class="menu-item" data-page="reports">
+                <i class="fas fa-chart-bar"></i>
+                <span>報表分析</span>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- 主要內容區 -->
+    <main class="main-content" id="mainContent">
+        <!-- 主控台頁面 -->
+        <div id="dashboard" class="page active">
+            <div class="page-header">
+                <h2><i class="fas fa-tachometer-alt"></i> 主控台</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="refreshDashboard">
+                        <i class="fas fa-sync-alt"></i> 重新整理
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 即時監控面板 -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>今日配送狀況</h3>
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-number" id="todayDeliveries">0</div>
+                        <div class="stat-label">已完成配送</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>車輛使用率</h3>
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-number" id="vehicleUsage">0%</div>
+                        <div class="stat-label">使用中車輛</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>準時率</h3>
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-number" id="onTimeRate">0%</div>
+                        <div class="stat-label">準時配送率</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>異常警示</h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-number alert" id="alertCount">0</div>
+                        <div class="stat-label">待處理異常</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速操作區 -->
+            <div class="quick-actions">
+                <h3>快速操作</h3>
+                <div class="action-buttons">
+                    <button class="btn btn-danger" id="emergencyDispatch">
+                        <i class="fas fa-ambulance"></i> 緊急調派
+                    </button>
+                    <button class="btn btn-warning" id="rerouteAll">
+                        <i class="fas fa-route"></i> 路線重規劃
+                    </button>
+                    <button class="btn btn-info" id="realTimeReroute">
+                        <i class="fas fa-directions"></i> 即時改道
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 路線管理頁面 -->
+        <div id="route-management" class="page">
+            <div class="page-header">
+                <h2><i class="fas fa-route"></i> 路線管理</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="addRoute">
+                        <i class="fas fa-plus"></i> 新增路線
+                    </button>
+                    <button class="btn btn-secondary" id="importRoutes">
+                        <i class="fas fa-upload"></i> 批量匯入
+                    </button>
+                </div>
+            </div>
+
+            <!-- 搜尋與篩選 -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <input type="text" id="routeSearch" placeholder="搜尋路線..." class="form-input">
+                    <select id="regionFilter" class="form-select">
+                        <option value="">全部區域</option>
+                        <option value="north">北部</option>
+                        <option value="central">中部</option>
+                        <option value="south">南部</option>
+                        <option value="east">東部</option>
+                    </select>
+                    <button class="btn btn-primary" id="searchRoutes">
+                        <i class="fas fa-search"></i> 搜尋
+                    </button>
+                </div>
+            </div>
+
+            <!-- 路線列表 -->
+            <div class="table-container">
+                <table class="data-table" id="routeTable">
+                    <thead>
+                        <tr>
+                            <th>路線編號</th>
+                            <th>路線名稱</th>
+                            <th>起點</th>
+                            <th>終點</th>
+                            <th>收送點數量</th>
+                            <th>預估時間</th>
+                            <th>狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routeTableBody">
+                        <!-- 動態載入資料 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AI路線優化頁面 -->
+        <div id="route-optimization" class="page">
+            <div class="page-header">
+                <h2><i class="fas fa-brain"></i> AI路線優化</h2>
+            </div>
+
+            <div class="optimization-container">
+                <!-- 優化參數設定 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>優化參數設定</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>優化目標：</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="optimizeTarget" value="time" checked> 最短時間</label>
+                                <label><input type="radio" name="optimizeTarget" value="distance"> 最短距離</label>
+                                <label><input type="radio" name="optimizeTarget" value="cost"> 最低成本</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>車輛限制：</label>
+                            <input type="number" id="vehicleLimit" class="form-input" placeholder="最大車輛數">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>時間窗口：</label>
+                            <input type="time" id="startTime" class="form-input">
+                            <span>至</span>
+                            <input type="time" id="endTime" class="form-input">
+                        </div>
+                        
+                        <button class="btn btn-primary btn-large" id="startOptimization">
+                            <i class="fas fa-play"></i> 開始優化分析
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 優化結果 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>優化結果</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="optimizationProgress" class="progress-container" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">分析中...</div>
+                        </div>
+                        
+                        <div id="optimizationResults" style="display: none;">
+                            <div class="result-summary">
+                                <div class="result-item">
+                                    <span class="result-label">優化前總距離：</span>
+                                    <span class="result-value" id="beforeDistance">-</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">優化後總距離：</span>
+                                    <span class="result-value" id="afterDistance">-</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">節省距離：</span>
+                                    <span class="result-value improvement" id="savedDistance">-</span>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-success" id="applyOptimization">
+                                    <i class="fas fa-check"></i> 採用建議
+                                </button>
+                                <button class="btn btn-secondary" id="exportResults">
+                                    <i class="fas fa-download"></i> 匯出報告
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 季節性路線頁面 -->
+        <div id="seasonal-routes" class="page">
+            <div class="page-header">
+                <h2><i class="fas fa-calendar-alt"></i> 季節性路線</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="addSeasonalRoute">
+                        <i class="fas fa-plus"></i> 新增季節路線
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>季節性路線管理功能開發中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 載運管理頁面 -->
+        <div id="cargo-vehicle" class="page">
+            <div class="page-header">
+                <h2><i class="fas fa-boxes"></i> 載運管理</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="addVehicle">
+                        <i class="fas fa-plus"></i> 新增車輛
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>載運管理功能開發中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 即時監控頁面 -->
+        <div id="real-time-monitor" class="page">
+            <div class="page-header">
+                <h2><i class="fas fa-satellite-dish"></i> 即時監控</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="refreshMonitor">
+                        <i class="fas fa-sync-alt"></i> 重新整理
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>即時監控功能開發中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系統設定頁面 -->
+        <div id="system-settings" class="page">
+            <div class="page-header">
+                <h2><i class="fas fa-cog"></i> 系統設定</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>系統設定功能開發中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 報表分析頁面 -->
+        <div id="reports" class="page">
+            <div class="page-header">
+                <h2><i class="fas fa-chart-bar"></i> 報表分析</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="generateReport">
+                        <i class="fas fa-file-alt"></i> 生成報表
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <p>報表分析功能開發中...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 載入中遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>載入中...</p>
+        </div>
     </div>
 
-    <div class="login-container">
-        <div class="logo-section">
-            <div class="company-logo">
-                <i class="fas fa-truck"></i>
+    <!-- 模態視窗 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">標題</h3>
+                <span class="modal-close" id="modalClose">&times;</span>
             </div>
-            <div class="company-name">昶青物流</div>
-            <div class="system-title">派車GAI數據管理系統</div>
-            <div class="subtitle">Intelligent Dispatch Management System</div>
+            <div class="modal-body" id="modalBody">
+                <!-- 動態內容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">取消</button>
+                <button class="btn btn-primary" id="modalConfirm">確認</button>
+            </div>
         </div>
+    </div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">帳號</label>
-                <div class="input-container">
-                    <i class="fas fa-user input-icon"></i>
-                    <input type="text" id="username" class="form-control" placeholder="請輸入您的帳號" required>
-                </div>
-            </div>
+    <!-- 通知容器 -->
+    <div id="notificationContainer"></div>
 
-            <div class="form-group">
-                <label for="password">密碼</label>
-                <div class="input-container">
-                    <i class="fas fa-lock input-icon" id="passwordIcon"></i>
-                    <input type="password" id="password" class="form-control" placeholder="請輸入您的密碼" required>
-                </div>
-            </div>
-
-            <div class="remember-me">
-                <input type="checkbox" id="rememberMe">
-                <label for="rememberMe">記住我的登入狀態</label>
-            </div>
-
-            <button type="submit" class="login-btn" id="loginBtn">
-                <i class="fas fa-sign-in-alt"></i>
-                登入系統
-                <div class="loading-spinner" id="loadingSpinner">
-                    <div class="spinner"></div>
-                </div>
-            </button>
-
-            <div class="error-message" id="errorMessage">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span id="errorText">帳號或密碼錯誤，請重新輸入</span>
-            </div>
-
-            <div class="success-message" id="successMessage">
-                <i class="fas fa-check-circle"></i>
-                <span id="successText">登入成功！正在跳轉...</span>
-            </div>
-        </form>
-
-        <div class="footer-info">
-            <div>© 2025 昶青物流有限公司 版權所有</div>
-            <div class="version-info">系統版本 v2.0 | 最後更新：2025-06-25</div>
-        </div>
+    <!-- 連線狀態指示器 -->
+    <div id="connectionStatus" class="connection-status online">
+        <i class="fas fa-wifi"></i> 已連線
     </div>
 
     <script>
-        // API 設定
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzl-08Jl-cs_qrHhOIOMEsKJpRlQ1Q2yERErZK-Jks14E5c5mRZURw5v_8LDWrGmKse/exec';
+        // ===== JavaScript 代碼 =====
+        
+        // 全域變數
+        const CONFIG = {
+            SPREADSHEET_ID: '1miCf_ZTVyzmA1MNbbZM3uUdZjluk99gZUH5w2q_XWs8',
+            GAS_URL: 'https://script.google.com/macros/s/AKfycbxn4G_Xv_AodTqY6nspcDNtT5EEp8WyTrTR0ZMroC-Lrp2ZiLwTwyzWrOw6EKJlcqmn/exec',
+            USE_MOCK_DATA: false,
+            SHEETS: {
+                DASHBOARD: 'A',
+                ROUTES: 'B', 
+                OPTIMIZATION: 'C',
+                SEASONAL: 'D',
+                CARGO_VEHICLE: 'E',
+                REALTIME: 'F',
+                SETTINGS: 'G',
+                LOGS: 'H'
+            }
+        };
+
+        // 全域使用者變數
+        let currentUser = null;
 
         // DOM 元素
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const errorText = document.getElementById('errorText');
-        const successText = document.getElementById('successText');
+        const elements = {
+            sidebar: document.getElementById('sidebar'),
+            mainContent: document.getElementById('mainContent'),
+            loadingOverlay: document.getElementById('loadingOverlay'),
+            modal: document.getElementById('modal'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalBody: document.getElementById('modalBody'),
+            modalClose: document.getElementById('modalClose'),
+            modalCancel: document.getElementById('modalCancel'),
+            modalConfirm: document.getElementById('modalConfirm'),
+            notificationContainer: document.getElementById('notificationContainer'),
+            connectionStatus: document.getElementById('connectionStatus'),
+            userInfo: document.getElementById('userInfo'),
+            userName: document.getElementById('userName'),
+            userRole: document.getElementById('userRole'),
+            userAvatar: document.getElementById('userAvatar')
+        };
 
-        // 頁面載入時檢查是否已登入
+        // 頁面載入時檢查登入狀態
         document.addEventListener('DOMContentLoaded', function() {
-            const savedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-            if (savedUser) {
-                const userData = JSON.parse(savedUser);
-                // 檢查登入是否仍有效（可設定過期時間）
+            // 檢查登入狀態
+            currentUser = getCurrentUser();
+            if (!currentUser) {
+                // 未登入，跳轉到登入頁面
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // 設定使用者介面
+            setupUserInterface(currentUser);
+            
+            // 初始化應用程式
+            app = new DispatchGAISystem();
+            
+            // 檢查是否為手機版本，添加選單切換功能
+            if (window.innerWidth <= 768) {
+                addMobileMenuToggle();
+            }
+        });
+
+        // 獲取當前使用者
+        function getCurrentUser() {
+            const sessionUser = sessionStorage.getItem('currentUser');
+            const localUser = localStorage.getItem('currentUser');
+            
+            if (sessionUser) {
+                return JSON.parse(sessionUser);
+            } else if (localUser) {
+                const userData = JSON.parse(localUser);
+                // 檢查是否過期（24小時）
                 const loginTime = new Date(userData.loginTime);
                 const now = new Date();
                 const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
                 
-                if (hoursDiff < 24) { // 24小時內有效
-                    redirectToDashboard(userData);
-                    return;
+                if (hoursDiff < 24) {
+                    return userData;
+                } else {
+                    localStorage.removeItem('currentUser');
                 }
             }
             
-            // 自動聚焦到帳號輸入框
-            document.getElementById('username').focus();
-        });
+            return null;
+        }
 
-        // 登入表單提交
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // 設定使用者介面
+        function setupUserInterface(userData) {
+            // 顯示使用者資訊
+            elements.userName.textContent = userData.name;
+            elements.userRole.textContent = userData.permissions.name;
+            elements.userAvatar.textContent = userData.name.charAt(0).toUpperCase();
             
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
+            // 根據權限隱藏/顯示選單項目
+            const menuItems = document.querySelectorAll('.menu-item[data-page]');
+            menuItems.forEach(item => {
+                const requiredPage = item.getAttribute('data-page');
+                if (!userData.permissions.pages.includes(requiredPage)) {
+                    item.style.display = 'none';
+                }
+            });
+        }
 
-            if (!username || !password) {
-                showError('請輸入帳號和密碼');
-                return;
+        // 登出功能
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                // 呼叫後端登出API (可選)
+                if (currentUser && app) {
+                    try {
+                        app.apiCall('logout', currentUser);
+                    } catch (error) {
+                        console.error('登出API呼叫失敗:', error);
+                    }
+                }
+                
+                // 清除本地儲存
+                sessionStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUser');
+                
+                // 跳轉到登入頁面
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 應用程式類別
+        class DispatchGAISystem {
+            constructor() {
+                this.currentPage = 'dashboard';
+                this.isOnline = true;
+                this.init();
             }
 
-            // 顯示載入狀態
-            setLoading(true);
-            hideMessages();
+            // 初始化系統
+            init() {
+                this.bindEvents();
+                this.checkConnection();
+                this.loadDashboard();
+                this.initializeSheets();
+            }
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify({
-                        action: 'login',
-                        data: {
-                            username: username,
-                            password: password
+            // 檢查頁面權限
+            checkPagePermission(pageName) {
+                if (!currentUser) {
+                    return false;
+                }
+                
+                return currentUser.permissions.pages.includes(pageName) || currentUser.permissions.fullAccess;
+            }
+
+            // 綁定事件
+            bindEvents() {
+                // 選單點擊事件
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const page = e.currentTarget.dataset.page;
+                        if (page) {
+                            this.switchPage(page);
                         }
-                    })
+                    });
                 });
 
-                const textResult = await response.text();
-                const result = JSON.parse(textResult);
+                // 主控台按鈕事件
+                document.getElementById('refreshDashboard')?.addEventListener('click', () => {
+                    this.loadDashboard();
+                });
 
-                if (result.success) {
-                    const userData = result.data;
-                    
-                    // 儲存使用者資訊
-                    const userInfo = {
-                        username: userData.username,
-                        name: userData.name,
-                        position: userData.position,
-                        level: userData.level,
-                        permissions: userData.permissions,
-                        loginTime: new Date().toISOString()
-                    };
+                // 緊急調派按鈕
+                document.getElementById('emergencyDispatch')?.addEventListener('click', () => {
+                    this.showEmergencyDispatchModal();
+                });
 
-                    if (rememberMe) {
-                        localStorage.setItem('currentUser', JSON.stringify(userInfo));
-                    } else {
-                        sessionStorage.setItem('currentUser', JSON.stringify(userInfo));
+                // 路線重規劃按鈕
+                document.getElementById('rerouteAll')?.addEventListener('click', () => {
+                    this.rerouteAllVehicles();
+                });
+
+                // 即時改道按鈕
+                document.getElementById('realTimeReroute')?.addEventListener('click', () => {
+                    this.showRealTimeRerouteModal();
+                });
+
+                // 路線管理事件
+                document.getElementById('addRoute')?.addEventListener('click', () => {
+                    this.showAddRouteModal();
+                });
+
+                document.getElementById('importRoutes')?.addEventListener('click', () => {
+                    this.showImportRoutesModal();
+                });
+
+                                document.getElementById('searchRoutes')?.addEventListener('click', () => {
+                    this.searchRoutes();
+                });
+
+                // AI路線優化事件
+                document.getElementById('startOptimization')?.addEventListener('click', () => {
+                    this.startRouteOptimization();
+                });
+
+                document.getElementById('applyOptimization')?.addEventListener('click', () => {
+                    this.applyOptimization();
+                });
+
+                document.getElementById('exportResults')?.addEventListener('click', () => {
+                    this.exportOptimizationResults();
+                });
+
+                // 登出事件
+                document.getElementById('logoutBtn')?.addEventListener('click', () => {
+                    logout();
+                });
+
+                // 模態視窗事件
+                elements.modalClose?.addEventListener('click', () => {
+                    this.hideModal();
+                });
+
+                elements.modalCancel?.addEventListener('click', () => {
+                    this.hideModal();
+                });
+
+                // 點擊遮罩關閉模態視窗
+                elements.modal?.addEventListener('click', (e) => {
+                    if (e.target === elements.modal) {
+                        this.hideModal();
                     }
+                });
 
-                    // 顯示成功訊息並跳轉
-                    showSuccess('登入成功！正在跳轉...');
-                    setTimeout(() => {
-                        redirectToDashboard(userInfo);
-                    }, 1000);
+                // 鍵盤事件
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.hideModal();
+                    }
+                });
+            }
 
-                } else {
-                    showError(result.error || '登入失敗，請檢查帳號密碼');
+            // 切換頁面
+            switchPage(pageName) {
+                // 檢查權限
+                if (!this.checkPagePermission(pageName)) {
+                    this.showNotification('您沒有權限存取此頁面', 'error');
+                    return;
+                }
+                
+                // 隱藏所有頁面
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+
+                // 移除所有選單項目的 active 類別
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // 顯示目標頁面
+                const targetPage = document.getElementById(pageName);
+                if (targetPage) {
+                    targetPage.classList.add('active');
                 }
 
-            } catch (error) {
-                console.error('登入錯誤:', error);
-                showError('系統連線錯誤，請稍後再試');
-            } finally {
-                setLoading(false);
-            }
-        });
+                // 添加選單項目的 active 類別
+                const targetMenuItem = document.querySelector(`[data-page="${pageName}"]`);
+                if (targetMenuItem) {
+                    targetMenuItem.classList.add('active');
+                }
 
-        // 設定載入狀態
-        function setLoading(loading) {
-            loginBtn.disabled = loading;
-            loadingSpinner.style.display = loading ? 'inline-block' : 'none';
+                this.currentPage = pageName;
+
+                // 載入頁面特定資料
+                this.loadPageData(pageName);
+            }
+
+            // 載入頁面資料
+            loadPageData(pageName) {
+                switch (pageName) {
+                    case 'dashboard':
+                        this.loadDashboard();
+                        break;
+                    case 'route-management':
+                        this.loadRoutes();
+                        break;
+                    case 'route-optimization':
+                        // 優化頁面不需要預載資料
+                        break;
+                    case 'seasonal-routes':
+                        this.loadSeasonalRoutes();
+                        break;
+                    case 'cargo-vehicle':
+                        this.loadVehicles();
+                        break;
+                    case 'real-time-monitor':
+                        this.loadRealTimeData();
+                        break;
+                    case 'system-settings':
+                        this.loadSystemSettings();
+                        break;
+                    case 'reports':
+                        this.loadReports();
+                        break;
+                }
+            }
+
+            // 檢查連線狀態
+            async checkConnection() {
+                try {
+                    const result = await this.apiCall('testConnection');
+                    this.updateConnectionStatus('online', '已連線');
+                    this.isOnline = true;
+                } catch (error) {
+                    this.updateConnectionStatus('offline', '離線模式');
+                    this.isOnline = false;
+                    CONFIG.USE_MOCK_DATA = true;
+                }
+            }
+
+            // 更新連線狀態顯示
+            updateConnectionStatus(status, text) {
+                elements.connectionStatus.className = `connection-status ${status}`;
+                elements.connectionStatus.innerHTML = `<i class="fas fa-${status === 'online' ? 'wifi' : 'wifi-slash'}"></i> ${text}`;
+            }
+
+            // API 呼叫
+            async apiCall(action, data = {}) {
+                const payload = {
+                    action,
+                    data,
+                    user: currentUser,
+                    timestamp: new Date().getTime()
+                };
+
+                try {
+                    const response = await fetch(CONFIG.GAS_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain',
+                        },
+                        body: JSON.stringify(payload),
+                        mode: 'cors',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const textResult = await response.text();
+                    const result = JSON.parse(textResult);
+                    
+                    if (!result.success) {
+                        throw new Error(result.error || '未知錯誤');
+                    }
+
+                    // 連線成功，更新狀態
+                    if (!this.isOnline) {
+                        this.isOnline = true;
+                        this.updateConnectionStatus('online', '已連線');
+                        CONFIG.USE_MOCK_DATA = false;
+                    }
+
+                    return result.data;
+                    
+                } catch (error) {
+                    console.error('API 呼叫失敗:', error);
+                    
+                    // 如果是網路錯誤，切換到離線模式
+                    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                        this.isOnline = false;
+                        this.updateConnectionStatus('offline', '離線模式');
+                        CONFIG.USE_MOCK_DATA = true;
+                        console.warn('切換至離線模式，使用模擬資料');
+                        return this.getMockData(action);
+                    }
+                    
+                    throw error;
+                }
+            }
+
+            // 獲取模擬資料
+            getMockData(action) {
+                const mockData = {
+                    testConnection: { status: 'mock', message: '模擬連線' },
+                    getDashboardData: {
+                        todayDeliveries: 156,
+                        vehicleUsage: 78,
+                        onTimeRate: 94,
+                        alertCount: 3
+                    },
+                    getRoutes: [
+                        {
+                            id: 'R001',
+                            name: '台北-桃園線',
+                            start: '台北市',
+                            end: '桃園市',
+                            stops: 8,
+                            estimatedTime: '2.5小時',
+                            status: '啟用'
+                        },
+                        {
+                            id: 'R002',
+                            name: '台中-彰化線',
+                            start: '台中市',
+                            end: '彰化縣',
+                            stops: 6,
+                            estimatedTime: '1.8小時',
+                            status: '啟用'
+                        }
+                    ],
+                    optimizeRoutes: {
+                        beforeDistance: 450,
+                        afterDistance: 380,
+                        savedDistance: 70,
+                        improvement: 15.6
+                    }
+                };
+
+                return mockData[action] || {};
+            }
+
+            // 初始化工作表
+            async initializeSheets() {
+                try {
+                    await this.apiCall('initializeSheets');
+                    console.log('工作表初始化完成');
+                } catch (error) {
+                    console.error('工作表初始化失敗:', error);
+                }
+            }
+
+            // 載入主控台資料
+            async loadDashboard() {
+                this.showLoading();
+                try {
+                    const data = await this.apiCall('getDashboardData');
+                    
+                    // 更新統計數據
+                    document.getElementById('todayDeliveries').textContent = data.todayDeliveries || 0;
+                    document.getElementById('vehicleUsage').textContent = `${data.vehicleUsage || 0}%`;
+                    document.getElementById('onTimeRate').textContent = `${data.onTimeRate || 0}%`;
+                    document.getElementById('alertCount').textContent = data.alertCount || 0;
+                    
+                    this.showNotification('主控台資料已更新', 'success');
+                } catch (error) {
+                    console.error('載入主控台資料失敗:', error);
+                    this.showNotification('載入主控台資料失敗', 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            // 載入路線資料
+            async loadRoutes() {
+                this.showLoading();
+                try {
+                    const routes = await this.apiCall('getRoutes');
+                    this.renderRouteTable(routes);
+                } catch (error) {
+                    console.error('載入路線資料失敗:', error);
+                    this.showNotification('載入路線資料失敗', 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            // 渲染路線表格
+            renderRouteTable(routes) {
+                const tbody = document.getElementById('routeTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+                
+                routes.forEach(route => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${route.id}</td>
+                        <td>${route.name}</td>
+                        <td>${route.start}</td>
+                        <td>${route.end}</td>
+                        <td>${route.stops}</td>
+                        <td>${route.estimatedTime}</td>
+                        <td><span class="status-badge ${route.status}">${route.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="app.editRoute('${route.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="app.deleteRoute('${route.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            // 搜尋路線
+            async searchRoutes() {
+                const searchTerm = document.getElementById('routeSearch').value;
+                const region = document.getElementById('regionFilter').value;
+                
+                this.showLoading();
+                try {
+                    const routes = await this.apiCall('searchRoutes', {
+                        searchTerm,
+                        region
+                    });
+                    this.renderRouteTable(routes);
+                } catch (error) {
+                    console.error('搜尋路線失敗:', error);
+                    this.showNotification('搜尋路線失敗', 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            // 新增路線
+            showAddRouteModal() {
+                const modalContent = `
+                    <div class="form-group">
+                        <label>路線名稱：</label>
+                        <input type="text" id="routeName" class="form-input" placeholder="請輸入路線名稱">
+                    </div>
+                    <div class="form-group">
+                        <label>起點：</label>
+                        <input type="text" id="routeStart" class="form-input" placeholder="請輸入起點">
+                    </div>
+                    <div class="form-group">
+                        <label>終點：</label>
+                        <input type="text" id="routeEnd" class="form-input" placeholder="請輸入終點">
+                    </div>
+                    <div class="form-group">
+                        <label>收送點數量：</label>
+                        <input type="number" id="routeStops" class="form-input" placeholder="請輸入收送點數量">
+                    </div>
+                `;
+                
+                this.showModal('新增路線', modalContent, async () => {
+                    const routeData = {
+                        name: document.getElementById('routeName').value,
+                        start: document.getElementById('routeStart').value,
+                        end: document.getElementById('routeEnd').value,
+                        stops: document.getElementById('routeStops').value
+                    };
+                    
+                    try {
+                        await this.apiCall('addRoute', routeData);
+                        this.showNotification('路線新增成功', 'success');
+                        this.loadRoutes();
+                        this.hideModal();
+                    } catch (error) {
+                        this.showNotification('路線新增失敗', 'error');
+                    }
+                });
+            }
+
+            // 刪除路線
+            async deleteRoute(routeId) {
+                if (confirm('確定要刪除此路線嗎？')) {
+                    try {
+                        await this.apiCall('deleteRoute', { routeId });
+                        this.showNotification('路線刪除成功', 'success');
+                        this.loadRoutes();
+                    } catch (error) {
+                        this.showNotification('路線刪除失敗', 'error');
+                    }
+                }
+            }
+
+            // 開始路線優化
+            async startRouteOptimization() {
+                const target = document.querySelector('input[name="optimizeTarget"]:checked').value;
+                const vehicleLimit = document.getElementById('vehicleLimit').value;
+                const startTime = document.getElementById('startTime').value;
+                const endTime = document.getElementById('endTime').value;
+
+                const optimizationData = {
+                    target,
+                    vehicleLimit: parseInt(vehicleLimit) || null,
+                    timeWindow: { start: startTime, end: endTime }
+                };
+
+                // 顯示進度條
+                document.getElementById('optimizationProgress').style.display = 'block';
+                document.getElementById('optimizationResults').style.display = 'none';
+
+                // 模擬進度更新
+                this.simulateProgress();
+
+                try {
+                    const results = await this.apiCall('optimizeRoutes', optimizationData);
+                    this.displayOptimizationResults(results);
+                } catch (error) {
+                    console.error('路線優化失敗:', error);
+                    this.showNotification('路線優化失敗', 'error');
+                    document.getElementById('optimizationProgress').style.display = 'none';
+                }
+            }
+
+            // 模擬進度更新
+            simulateProgress() {
+                let progress = 0;
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress > 100) progress = 100;
+                    
+                    progressFill.style.width = `${progress}%`;
+                    
+                    if (progress < 30) {
+                        progressText.textContent = '分析路線資料...';
+                    } else if (progress < 60) {
+                        progressText.textContent = 'AI演算法計算中...';
+                    } else if (progress < 90) {
+                        progressText.textContent = '優化方案生成中...';
+                    } else {
+                        progressText.textContent = '完成分析';
+                        clearInterval(interval);
+                    }
+                }, 200);
+            }
+
+            // 顯示優化結果
+            displayOptimizationResults(results) {
+                document.getElementById('optimizationProgress').style.display = 'none';
+                document.getElementById('optimizationResults').style.display = 'block';
+                
+                document.getElementById('beforeDistance').textContent = `${results.beforeDistance} km`;
+                document.getElementById('afterDistance').textContent = `${results.afterDistance} km`;
+                document.getElementById('savedDistance').textContent = `${results.savedDistance} km (${results.improvement}%)`;
+                
+                this.showNotification('路線優化分析完成', 'success');
+            }
+
+            // 採用優化建議
+            async applyOptimization() {
+                if (confirm('確定要採用此優化建議嗎？')) {
+                    try {
+                        await this.apiCall('applyOptimization');
+                        this.showNotification('優化建議已採用', 'success');
+                        this.loadRoutes();
+                    } catch (error) {
+                        this.showNotification('採用優化建議失敗', 'error');
+                    }
+                }
+            }
+
+            // 緊急調派
+            showEmergencyDispatchModal() {
+                const modalContent = `
+                    <div class="form-group">
+                        <label>緊急事件類型：</label>
+                        <select id="emergencyType" class="form-select">
+                            <option value="accident">交通事故</option>
+                            <option value="breakdown">車輛故障</option>
+                            <option value="urgent">緊急配送</option>
+                            <option value="weather">天氣異常</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>影響區域：</label>
+                        <input type="text" id="affectedArea" class="form-input" placeholder="請輸入影響區域">
+                    </div>
+                    <div class="form-group">
+                        <label>緊急程度：</label>
+                        <select id="urgencyLevel" class="form-select">
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                `;
+                
+                this.showModal('緊急調派', modalContent, async () => {
+                    const emergencyData = {
+                        type: document.getElementById('emergencyType').value,
+                        area: document.getElementById('affectedArea').value,
+                        urgency: document.getElementById('urgencyLevel').value
+                    };
+                    
+                    try {
+                        await this.apiCall('emergencyDispatch', emergencyData);
+                        this.showNotification('緊急調派已啟動', 'success');
+                        this.hideModal();
+                    } catch (error) {
+                        this.showNotification('緊急調派失敗', 'error');
+                    }
+                });
+            }
+
+            // 路線重規劃
+            async rerouteAllVehicles() {
+                if (confirm('確定要重新規劃所有車輛路線嗎？此操作可能需要一些時間。')) {
+                    this.showLoading();
+                    try {
+                        await this.apiCall('rerouteAll');
+                        this.showNotification('路線重規劃完成', 'success');
+                        this.loadDashboard();
+                    } catch (error) {
+                        this.showNotification('路線重規劃失敗', 'error');
+                    } finally {
+                        this.hideLoading();
+                    }
+                }
+            }
+
+            // 即時改道
+            showRealTimeRerouteModal() {
+                const modalContent = `
+                    <div class="form-group">
+                        <label>車輛編號：</label>
+                        <input type="text" id="vehicleId" class="form-input" placeholder="請輸入車輛編號">
+                    </div>
+                    <div class="form-group">
+                        <label>改道原因：</label>
+                        <select id="rerouteReason" class="form-select">
+                            <option value="traffic">交通堵塞</option>
+                            <option value="roadwork">道路施工</option>
+                            <option value="accident">交通事故</option>
+                            <option value="weather">天氣因素</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>新目的地：</label>
+                        <input type="text" id="newDestination" class="form-input" placeholder="請輸入新目的地">
+                    </div>
+                `;
+                
+                this.showModal('即時改道', modalContent, async () => {
+                    const rerouteData = {
+                        vehicleId: document.getElementById('vehicleId').value,
+                        reason: document.getElementById('rerouteReason').value,
+                        newDestination: document.getElementById('newDestination').value
+                    };
+                    
+                    try {
+                        await this.apiCall('realTimeReroute', rerouteData);
+                        this.showNotification('即時改道指令已發送', 'success');
+                        this.hideModal();
+                    } catch (error) {
+                        this.showNotification('即時改道失敗', 'error');
+                    }
+                });
+            }
+
+            // 載入其他頁面資料的空方法（待實作）
+            loadSeasonalRoutes() {
+                console.log('載入季節性路線資料');
+            }
+
+            loadVehicles() {
+                console.log('載入車輛資料');
+            }
+
+            loadRealTimeData() {
+                console.log('載入即時監控資料');
+            }
+
+            loadSystemSettings() {
+                console.log('載入系統設定');
+            }
+
+            loadReports() {
+                console.log('載入報表資料');
+            }
+
+            // 顯示模態視窗
+            showModal(title, content, confirmCallback = null) {
+                elements.modalTitle.textContent = title;
+                elements.modalBody.innerHTML = content;
+                elements.modal.classList.add('show');
+                
+                // 設定確認按鈕事件
+                elements.modalConfirm.onclick = confirmCallback || (() => this.hideModal());
+            }
+
+            // 隱藏模態視窗
+            hideModal() {
+                elements.modal.classList.remove('show');
+                elements.modalConfirm.onclick = null;
+            }
+
+            // 顯示載入中
+            showLoading() {
+                elements.loadingOverlay.classList.add('show');
+            }
+
+            // 隱藏載入中
+            hideLoading() {
+                elements.loadingOverlay.classList.remove('show');
+            }
+
+            // 顯示通知
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${this.getNotificationIcon(type)}"></i>
+                    ${message}
+                `;
+                
+                elements.notificationContainer.appendChild(notification);
+                
+                // 顯示動畫
+                setTimeout(() => notification.classList.add('show'), 100);
+                
+                // 自動隱藏
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            // 獲取通知圖示
+            getNotificationIcon(type) {
+                const icons = {
+                    success: 'check-circle',
+                    error: 'exclamation-circle',
+                    warning: 'exclamation-triangle',
+                    info: 'info-circle'
+                };
+                return icons[type] || 'info-circle';
+            }
+        }
+
+        // 手機版選單切換
+        function addMobileMenuToggle() {
+            const menuToggle = document.createElement('button');
+            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            menuToggle.className = 'btn btn-primary mobile-menu-toggle';
+            menuToggle.style.cssText = `
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1001;
+                display: block;
+            `;
             
-            if (loading) {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登入中... <div class="loading-spinner" style="display: inline-block;"><div class="spinner"></div></div>';
-            } else {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登入系統';
-            }
-        }
-
-        // 顯示錯誤訊息
-        function showError(message) {
-            errorText.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
+            document.body.appendChild(menuToggle);
             
-            // 3秒後自動隱藏
-            setTimeout(hideMessages, 3000);
-        }
-
-        // 顯示成功訊息
-        function showSuccess(message) {
-            successText.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-        }
-
-        // 隱藏所有訊息
-        function hideMessages() {
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-        }
-
-        // 跳轉到主控台
-        function redirectToDashboard(userData) {
-            window.location.href = 'index.html';
-        }
-
-        // 密碼顯示/隱藏功能
-        const passwordInput = document.getElementById('password');
-        const passwordIcon = document.getElementById('passwordIcon');
-        
-        passwordIcon.addEventListener('click', function() {
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                this.classList.remove('fa-lock');
-                this.classList.add('fa-unlock');
-            } else {
-                passwordInput.type = 'password';
-                this.classList.remove('fa-unlock');
-                this.classList.add('fa-lock');
-            }
-        });
-
-        // 鍵盤事件處理
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !loginBtn.disabled) {
-                loginForm.dispatchEvent(new Event('submit'));
-            }
-        });
-
-        // 輸入框焦點效果
-        const inputs = document.querySelectorAll('.form-control');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'scale(1.02)';
+            menuToggle.addEventListener('click', () => {
+                elements.sidebar.classList.toggle('open');
             });
             
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'scale(1)';
+            // 點擊主要內容區域時關閉選單
+            elements.mainContent.addEventListener('click', () => {
+                elements.sidebar.classList.remove('open');
             });
-        });
+        }
+
+        // 全域變數
+        let app;
     </script>
 </body>
 </html>
+
