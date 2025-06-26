@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -60,13 +60,6 @@
             box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
         }
 
-        .system-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
         .company-name {
             font-size: 28px;
             font-weight: bold;
@@ -75,6 +68,13 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 10px;
+        }
+
+        .system-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
         }
 
         .subtitle {
@@ -124,6 +124,7 @@
             transform: translateY(-50%);
             color: #95a5a6;
             font-size: 18px;
+            cursor: pointer;
         }
 
         .login-btn {
@@ -145,10 +146,6 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
         .login-btn:disabled {
             background: #bdc3c7;
             cursor: not-allowed;
@@ -162,6 +159,17 @@
             border-radius: 8px;
             margin-top: 15px;
             border-left: 4px solid #e74c3c;
+            display: none;
+            text-align: left;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #28a745;
             display: none;
             text-align: left;
         }
@@ -305,7 +313,7 @@
             <div class="form-group">
                 <label for="password">密碼</label>
                 <div class="input-container">
-                    <i class="fas fa-lock input-icon"></i>
+                    <i class="fas fa-lock input-icon" id="passwordIcon"></i>
                     <input type="password" id="password" class="form-control" placeholder="請輸入您的密碼" required>
                 </div>
             </div>
@@ -327,6 +335,11 @@
                 <i class="fas fa-exclamation-triangle"></i>
                 <span id="errorText">帳號或密碼錯誤，請重新輸入</span>
             </div>
+
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <span id="successText">登入成功！正在跳轉...</span>
+            </div>
         </form>
 
         <div class="footer-info">
@@ -337,18 +350,20 @@
 
     <script>
         // API 設定
-        const API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxn4G_Xv_AodTqY6nspcDNtT5EEp8WyTrTR0ZMroC-Lrp2ZiLwTwyzWrOw6EKJlcqmn/exec';
 
         // DOM 元素
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
         const errorText = document.getElementById('errorText');
+        const successText = document.getElementById('successText');
 
         // 頁面載入時檢查是否已登入
         document.addEventListener('DOMContentLoaded', function() {
-            const savedUser = localStorage.getItem('currentUser');
+            const savedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
             if (savedUser) {
                 const userData = JSON.parse(savedUser);
                 // 檢查登入是否仍有效（可設定過期時間）
@@ -381,13 +396,13 @@
 
             // 顯示載入狀態
             setLoading(true);
-            hideError();
+            hideMessages();
 
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain',
                     },
                     body: JSON.stringify({
                         action: 'login',
@@ -398,7 +413,8 @@
                     })
                 });
 
-                const result = await response.json();
+                const textResult = await response.text();
+                const result = JSON.parse(textResult);
 
                 if (result.success) {
                     const userData = result.data;
@@ -443,7 +459,7 @@
             loadingSpinner.style.display = loading ? 'inline-block' : 'none';
             
             if (loading) {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登入中... <div class="loading-spinner" id="loadingSpinner"><div class="spinner"></div></div>';
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登入中... <div class="loading-spinner" style="display: inline-block;"><div class="spinner"></div></div>';
             } else {
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登入系統';
             }
@@ -453,23 +469,23 @@
         function showError(message) {
             errorText.textContent = message;
             errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
             
             // 3秒後自動隱藏
-            setTimeout(hideError, 3000);
-        }
-
-        // 隱藏錯誤訊息
-        function hideError() {
-            errorMessage.style.display = 'none';
+            setTimeout(hideMessages, 3000);
         }
 
         // 顯示成功訊息
         function showSuccess(message) {
-            errorMessage.style.background = '#d4edda';
-            errorMessage.style.color = '#155724';
-            errorMessage.style.borderLeftColor = '#28a745';
-            errorText.innerHTML = '<i class="fas fa-check-circle"></i> ' + message;
-            errorMessage.style.display = 'block';
+            successText.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        // 隱藏所有訊息
+        function hideMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
         }
 
         // 跳轉到主控台
@@ -481,6 +497,22 @@
             
             window.location.href = `index.html?${params.toString()}`;
         }
+
+        // 密碼顯示/隱藏功能
+        const passwordInput = document.getElementById('password');
+        const passwordIcon = document.getElementById('passwordIcon');
+        
+        passwordIcon.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('fa-lock');
+                this.classList.add('fa-unlock');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('fa-unlock');
+                this.classList.add('fa-lock');
+            }
+        });
 
         // 鍵盤事件處理
         document.addEventListener('keydown', function(e) {
@@ -499,36 +531,6 @@
             input.addEventListener('blur', function() {
                 this.parentElement.style.transform = 'scale(1)';
             });
-        });
-
-        // 密碼顯示/隱藏功能
-        const passwordInput = document.getElementById('password');
-        const passwordIcon = passwordInput.parentElement.querySelector('.input-icon');
-        
-        passwordIcon.addEventListener('click', function() {
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                this.classList.remove('fa-lock');
-                this.classList.add('fa-unlock');
-            } else {
-                passwordInput.type = 'password';
-                this.classList.remove('fa-unlock');
-                this.classList.add('fa-lock');
-            }
-        });
-
-        // 防止多次提交
-        let isSubmitting = false;
-        loginForm.addEventListener('submit', function(e) {
-            if (isSubmitting) {
-                e.preventDefault();
-                return false;
-            }
-            isSubmitting = true;
-            
-            setTimeout(() => {
-                isSubmitting = false;
-            }, 2000);
         });
     </script>
 </body>
